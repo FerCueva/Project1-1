@@ -1,8 +1,6 @@
 import os
 import filecmp
-#extra credit
-#from dateutil.relativedelta import *
-#from datetime import date
+from datetime import date, datetime
 
 def getData(file):
 # get a list of dictionary objects from the file 
@@ -10,6 +8,7 @@ def getData(file):
 #Ouput: return a list of dictionary objects where
 #the keys are from the first row in the data. and the values are each of the other rows
         inFile = open(file,"r")
+        next(inFile)
         lines = inFile.readlines()
         inFile.close()
 
@@ -76,14 +75,64 @@ def classSizes(data):
         classSizes_List.append(("Freshman", freshman_counter))
         return sorted(classSizes_List, key = lambda k: k[1], reverse = True)
 
+def findMonth(a):
+#Find the most common birth month form this data
+# Input: list of dictionaries
+# Output: Return the month (1-12) that had the most births in the data
+
+        birthMonth_List = {}
+
+        for i in a:
+                if i["DOB"].split("/")[0] in birthMonth_List:
+                        birthMonth_List[i["DOB"].split("/")[0]] += 1
+
+                elif i["DOB"].split("/")[0] not in birthMonth_List:
+                        
+                        birthMonth_List[i["DOB"].split("/")[0]] = 1
+
+        sorted_birthMonth_List = sorted(birthMonth_List.items(), key = lambda k: k[1], reverse = True)
+        return(int(sorted_birthMonth_List[0][0]))                                       
+                        
+
+def mySortPrint(a,col,fileName):
+#Similar to mySort, but instead of returning single
+#Student, the sorted data is saved to a csv file.
+# as first,last,email
+#Input: list of dictionaries, col (key) to sort by and output file name
+#Output: No return value, but the file is written
+        outFile = open(str(fileName),"w")
+
+        sorted_Data = sorted(a, key = lambda k:k[str(col)])
+
+        for data in sorted_Data:
                 
+                first = data["First"]
+                last = data["Last"]
+                email = data["Email"]
+                outFile.write(first + "," + last + "," + email + "\n")
+                
+        outFile.close()
+        
+def findAge(a):
+# def findAge(a):
+# Input: list of dictionaries
+# Output: Return the average age of the students and round that age to the nearest
+# integer.  You will need to work with the DOB and the current date to find the current
+# age in years.
+        ages_list = []
 
+        now = datetime.now()
+        
+        for student in a:
+                age = abs(int(now.year) - int(student["DOB"].split("/")[2]))
+                ages_list.append(age)
 
+        average_age = (int(sum(ages_list)/len(ages_list)))
+                       
+        return average_age
+                        
 
-
-
-mySort(getData("P1DataA.csv"), "First")
-classSizes(getData("P1DataA.csv"))
+        
 
 ################################################################
 ## DO NOT MODIFY ANY CODE BELOW THIS
@@ -145,4 +194,3 @@ def main():
 if __name__ == '__main__':
     main()
 
-mySort(getData("P1DataA.csv"), "First")
